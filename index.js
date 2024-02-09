@@ -3,21 +3,49 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const req = require('express/lib/request');
+const axios = require('axios')
+const os = require('os');
 
 
 const app = express();
 app.use(cors());
 
 const PORT = process.env.PORT || 8080
+const hostname = os.hostname();
+let pokemonList = [];
+let products = [];
 
-app.get('/', (req, res, next) => {
+const getPokemon = async () => {
+    try {
+        const pokemonResults = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=3');
+        pokemonList = pokemonResults.data.results;
+    } catch (error) {
+        console.log(error);
+    }
 
-    const serverIpAddress = req.socket.localAddress;
+}
+
+const getProducts = async () => {
+    try {
+        const productResults = await axios.get('https://ucn40obxnl.execute-api.us-west-2.amazonaws.com/staging/products');
+        products = JSON.parse(productResults.data.body);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+app.get('/', async (req, res, next) => {
+
+    getPokemon();
+    getProducts();
+
     const data = {
-        Message: 'Hello World',
-        Region: 'us-west-2',
-        IPv6Address: serverIpAddress
+        Service: 'Demo EC2 Server',
+        ServiceLocation: hostname,
+        data: {
+            pokemonList,
+            products,
+        },
     }
 
     res.status(200).send(data);

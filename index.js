@@ -41,7 +41,7 @@ app.get('/', async (req, res, next) => {
 
     const data = {
         Service: 'Demo EC2 Server',
-        ServiceLocation: hostname,
+        Hostname: hostname,
         data: {
             pokemonList,
             products,
